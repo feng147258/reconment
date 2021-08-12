@@ -84,6 +84,7 @@ class ItemBaseCF(object):
                 if j in action_item.keys():
                     continue
                 rank.setdefault(j, 0)
+
                 rank[j] += score * wj / 10000  # 商品 j 与 商品item的相似度 * 商品item的兴趣得分，结果作为 user 对商品 j 的兴趣程度
 
         recall_ = list(dict(sorted(self.rank.items(), key=lambda x: x[1], reversed=True)[0:topK]))
