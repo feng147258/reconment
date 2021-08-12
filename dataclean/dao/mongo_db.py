@@ -10,8 +10,8 @@ import pymongo
 class MongoDB(object):
     def __init__(self, db=None,collentions =None):
         mongo_client = self._connect('localhost', 27017, '', '', db)
-        self.db = mongo_client[db]  #使用 recommend_test 库
-        self.collection = self.db[collentions]   #使用 test_collentions 集合
+        self.db_client = mongo_client[db]  #使用 recommend_test 库
+        self.collection = self.db_client[collentions]   #使用 test_collentions 集合
 
 
     def _connect(self, host, port, user, pwd, db):

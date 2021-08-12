@@ -5,15 +5,20 @@
 # @File    : item_base_cf.py
 import math
 from tqdm import tqdm
+import sys
+
+sys.path.append("..")
 
 
 class ItemBaseCF(object):
-    def __init__(self):
+    def __init__(self, train_file):
         self.train_data = dict()
         self.user_item_history = dict()
-        self.item2item_similary_matrix, self.item_count = dict(), dict()
+        self.item2item_similary_matrix = dict()  # 文章-文章的共现矩阵
+        self.item_count = dict()  # 文章被多少个用户阅读了
+        self.get_data(train_file)
 
-    def read_data(self, train_file):
+    def get_data(self, train_file):
         """
          从文件中读数据，生成训练数据集
         :param train_file: 训练文件
@@ -48,7 +53,8 @@ class ItemBaseCF(object):
                     self.item2item_similary_matrix.setdefault(i, {})
 
                     # 计算的方式可根据不同的策略进行更改，这里只是乘积开根号取倒数
-                    self.item2item_similary_matrix[i][j] += 1 / (math.sqrt(self.item_count[i] * self.item_count[j]))
+                    one_user_items_matrix = math.sqrt(self.item_count[i] * self.item_count[j])
+                    self.item2item_similary_matrix[i][j] += 1 / one_user_items_matrix
 
         for _item in self.item2item_similary_matrix:
             self.item2item_similary_matrix[_item] = dict(sorted(self.item2item_similary_matrix[_item].items(),
@@ -61,18 +67,31 @@ class ItemBaseCF(object):
         """
         pass
 
-    def cal_recall(self, user, weight, topK=30):
+    def cal_recall(self, user, topK=30):
         """
-        计算召回
+        计算召回,推荐给 user 对应的 item
         :param user:
         :param weight: 相似矩阵
         :param topK:取前 k 个
-        :return:
+        :return:  推荐给 user 的 items list
         """
-        pass
+
+        rank = dict()  # 记录推荐给用户且去重后（已经读过）的商品，和感兴趣的程度
+        action_item = self.train_data[user]
+
+        for item, score in action_item.items():
+            for j, wj in self.item2item_similary_matrix[item].items():
+                if j in action_item.keys():
+                    continue
+                rank.setdefault(j, 0)
+                rank[j] += score * wj / 10000  # 商品 j 与 商品item的相似度 * 商品item的兴趣得分，结果作为 user 对商品 j 的兴趣程度
+
+        recall_ = list(dict(sorted(self.rank.items(), key=lambda x: x[1], reversed=True)[0:topK]))
+
+        return recall_
 
 
 if __name__ == '__main__':
-    # test_dict = {"name":{"name11":1,"age11":18},"age":{"name22":1,"age22":18}}
-    for it in tqdm(range(40000000)):
-        pass
+    test_dict = {"name": {"name11": 1, "age11": 18}, "age": {"name22": 1, "age22": 18}}
+    for it in test_dict:
+        print(it)

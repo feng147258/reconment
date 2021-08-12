@@ -25,7 +25,7 @@ class LogData(object):
         :return:
         """
 
-        collections = self._mongo.db_loginfo[tables]
+        collections = self._mongo.db_client[tables]
         info = dict()
         info["user_id"] = user_id
         info["content_id"] = content_id

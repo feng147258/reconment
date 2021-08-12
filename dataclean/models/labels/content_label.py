@@ -4,25 +4,24 @@
 # @Author  : zhuyingjun
 # @File    : content_label.py
 import re
-from dao.mongo_db import MongoDB
-from dao.mysql_db import Mysql
-from dao.redis_db import MyRedis
+from dataclean.dao.mongo_db import MongoDB
+from dataclean.dao.mysql_db import Mysql
+from dataclean.dao.redis_db import MyRedis
 from datetime import datetime
-from models.keywords.tf_idf import Segment
+from dataclean.models.keywords.tf_idf import Segment
 from sqlalchemy import distinct
-from models.labels.entity.content import Content
+from dataclean.models.labels.entity.content import Content
 '''
 ContentLable 
 '''
 
 class ContentLabel(object):
     def __init__(self):
-        mongo_db = MongoDB(db='content_labels')
         self.seg = Segment(stopword_files=[], userdict_files=[])
         self.engine = Mysql()
         self.session = self.engine._DBSession()
-        self.mongo = MongoDB(db="loginfo",collentions='content_collentions')
-        self.db_loginfo = self.mongo.db
+        self.mongo = MongoDB(db="recommendation",collentions='content_labels')
+        self.db_loginfo = self.mongo.db_client
         self.collection = self.mongo.collection
 
 
